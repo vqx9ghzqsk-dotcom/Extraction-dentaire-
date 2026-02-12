@@ -3,580 +3,416 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Étude prévalence indications extraction dentaire - Hôpital Général de Makala</title>
+    <title>Gestionnaire d'Étude Clinique - Extraction Dentaire HGR Makala</title>
     <style>
-        /* --- STYLE GLOBAL (Conservé et Adapté) --- */
-        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f4f8; margin: 0; padding: 15px; }
-        .container { max-width: 1200px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.15); min-height: 900px;}
-        
-        /* Navigation (Bleu clinique pour le dentaire au lieu du rose cancer du sein) */
-        .header-tabs { display: flex; background: #fff; border-bottom: 3px solid #0277bd; padding: 12px; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; }
-        .tab { padding: 10px 15px; font-weight: bold; font-size: 12px; text-decoration: none; border-radius: 4px; border: 1px solid #ddd; color: #555; background: #f8f9fa; cursor: pointer; transition: 0.2s; }
-        .tab.active { background: #0277bd; color: white; border-color: #0277bd; }
-        
-        .sim-badge { background: #ff9800; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 10px; }
-        .admin-only { display: none !important; }
-        .admin-visible { display: inline-block !important; }
-        
-        .btn-auth { margin-left: auto; background: #333; color: white; padding: 10px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
-        .btn-excel { background: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 10px;}
-        .btn-delete-selected { background: #c62828; color: white; padding: 8px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-bottom: 10px; display: none; }
-        .btn-view-single { background: none; border: 1px solid #0288d1; color: #0288d1; cursor: pointer; border-radius: 4px; padding: 2px 5px; font-size: 10px; }
-        .btn-view-single:hover { background: #0288d1; color: white; }
+        /* --- DESIGN SYSTÈME (Format Ordinateur) --- */
+        :root {
+            --primary: #0277bd;
+            --secondary: #00acc1;
+            --accent: #f57c00;
+            --bg: #f4f7f6;
+            --text: #2c3e50;
+            --white: #ffffff;
+            --shadow: 0 4px 20px rgba(0,0,0,0.08);
+        }
 
-        /* Contenu */
-        .form-content { padding: 30px; display: none; }
-        .form-content.active { display: block; animation: fadeIn 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 0; overflow-x: hidden; }
 
-        /* Sections */
-        .section-title { background: #e1f5fe; color: #0277bd; padding: 15px; font-weight: bold; border-left: 8px solid #0277bd; margin: 30px 0 15px 0; text-transform: uppercase; font-size: 14px; display: flex; align-items: center; justify-content: space-between; }
-        .sub-title { font-weight: bold; color: #0277bd; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+        /* Navigation Latérale ou Top Bar */
+        .navbar { background: var(--white); height: 70px; display: flex; align-items: center; padding: 0 30px; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 1000; }
+        .logo { font-weight: 800; color: var(--primary); font-size: 20px; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; }
         
-        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-bottom: 15px; }
-        .field { display: flex; flex-direction: column; }
-        label { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #222; }
-        select, input[type="text"], input[type="number"], input[type="date"], textarea { padding: 10px; border: 1px solid #bbb; border-radius: 6px; font-size: 14px; background: #fff; width: 100%; box-sizing: border-box; }
+        .nav-tabs { display: flex; margin-left: 50px; gap: 5px; height: 100%; }
+        .tab-btn { border: none; background: none; padding: 0 20px; font-weight: 600; color: #7f8c8d; cursor: pointer; transition: 0.3s; border-bottom: 3px solid transparent; height: 100%; font-size: 14px; }
+        .tab-btn:hover { color: var(--primary); background: #f0f7f9; }
+        .tab-btn.active { color: var(--primary); border-bottom: 3px solid var(--primary); background: #f0f7f9; }
 
-        /* Tables & Check */
-        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px; }
-        th { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; text-align: center; font-weight: bold; }
-        td { border: 1px solid #eee; padding: 10px; text-align: center; vertical-align: middle; }
+        .container { max-width: 1400px; margin: 30px auto; padding: 0 20px; }
 
-        .btn-save { width: 100%; background: #0277bd; color: white; padding: 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 40px; text-transform: uppercase; transition: 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .btn-save:hover { background: #01579b; transform: translateY(-2px); }
-        
-        /* Stats */
-        .stat-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .stat-title { font-weight: bold; color: #555; margin-bottom: 15px; font-size: 14px; border-bottom: 2px solid #0277bd; display: inline-block; }
-        
-        .bar-container { display: flex; align-items: center; margin-bottom: 12px; font-size: 12px; }
-        .bar-label { width: 220px; font-weight: 600; color: #444; }
-        .bar-track { flex-grow: 1; background: #f0f0f0; height: 20px; border-radius: 10px; margin: 0 15px; overflow: hidden; }
-        .bar-fill { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; font-weight: bold; transition: width 1s; }
-        .bar-value { width: 40px; text-align: right; font-weight: bold; color: #0277bd; }
+        /* Conteneurs Onglets */
+        .page { display: none; animation: fadeIn 0.4s ease-out; }
+        .page.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .counter-badge { background: #0277bd; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; vertical-align: middle; margin-left: 5px;}
+        /* CARTES ET FORMULAIRES */
+        .card { background: var(--white); border-radius: 12px; padding: 30px; box-shadow: var(--shadow); margin-bottom: 25px; border: 1px solid #eef2f3; }
+        .section-header { border-left: 5px solid var(--primary); padding-left: 15px; margin: 25px 0 20px 0; color: var(--primary); font-size: 16px; text-transform: uppercase; font-weight: bold; }
 
-        /* Modal & Toast (Identique) */
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999; display: none; justify-content: center; align-items: center; }
-        .modal-content { background: white; width: 80%; max-width: 600px; padding: 25px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
-        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed #eee; font-size: 13px; }
-        
-        #toast { visibility: hidden; min-width: 250px; margin-left: -125px; background-color: #333; color: #fff; text-align: center; border-radius: 2px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; font-size: 17px; }
-        #toast.show { visibility: visible; -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
-        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
-        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
+        .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 25px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        label { font-weight: 700; font-size: 13px; color: #50667a; }
+        input, select, textarea { padding: 12px; border: 1px solid #dcdfe6; border-radius: 8px; font-size: 14px; transition: 0.3s; }
+        input:focus, select:focus { border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px rgba(2, 119, 189, 0.1); }
+
+        /* Style spécifique pour les cases à cocher (Grille Dentaire) */
+        .dental-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 5px; text-align: center; background: #f9fafb; padding: 15px; border-radius: 10px; }
+        .tooth-btn { padding: 8px; border: 1px solid #ddd; border-radius: 4px; font-size: 11px; cursor: pointer; background: white; }
+        .tooth-btn.selected { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* BOUTONS */
+        .btn-main { background: var(--primary); color: white; border: none; padding: 15px 35px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; font-size: 15px; }
+        .btn-main:hover { background: #01579b; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(2, 119, 189, 0.3); }
+
+        /* TABLEAUX (Matrice) */
+        table { width: 100%; border-collapse: collapse; margin-top: 10px; background: white; }
+        th { background: #f8fabb; color: var(--text); padding: 15px; text-align: left; font-size: 13px; border-bottom: 2px solid #edf2f7; }
+        td { padding: 15px; border-bottom: 1px solid #edf2f7; font-size: 13px; }
+        tr:hover { background: #fcfdfe; }
+        .badge { padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: bold; }
+        .badge-blue { background: #e1f5fe; color: #0277bd; }
+
+        /* ANALYSE ET STATS */
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+        .stat-box { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); text-align: center; }
+        .stat-number { font-size: 28px; font-weight: 800; color: var(--primary); }
+        .stat-label { font-size: 12px; color: #7f8c8d; margin-top: 5px; }
+
+        .chart-container { background: white; padding: 20px; border-radius: 12px; box-shadow: var(--shadow); height: 300px; display: flex; align-items: flex-end; gap: 10px; padding-top: 50px; }
+        .bar { background: var(--primary); border-radius: 4px 4px 0 0; position: relative; flex: 1; transition: 0.5s; }
+        .bar:hover { background: var(--secondary); }
+        .bar-label { position: absolute; top: -25px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; width: 100%; text-align: center; }
+        .bar-name { position: absolute; bottom: -30px; left: 50%; transform: translateX(-50%) rotate(-45deg); font-size: 10px; white-space: nowrap; }
+
     </style>
 </head>
 <body>
 
+<div class="navbar">
+    <div class="logo">🦷 CLINIC-DATA <span>| MAKALA</span></div>
+    <div class="nav-tabs">
+        <button class="tab-btn active" onclick="openTab(event, 'tab-collecte')">1. COLLECTE DE DONNÉES</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-matrice')">2. MATRICE & CODIFICATION</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-analyse')">3. ANALYSE STATISTIQUE</button>
+        <button class="tab-btn" onclick="openTab(event, 'tab-rapport')">4. RECOMMANDATIONS</button>
+    </div>
+</div>
+
 <div class="container">
-    <div class="header-tabs">
-        <button class="tab active" onclick="switchTab(1)">1. SAISIE CLINIQUE <span id="count-badge" class="counter-badge">0</span></button>
-        <button class="tab admin-only" id="tab-2" onclick="switchTab(2)">2. MATRICE DE DONNÉES</button>
-        <button class="tab admin-only" id="tab-3" onclick="switchTab(3)">3. ANALYSE STATISTIQUE</button>
-        
-        <div class="sim-badge">HGR MAKALA - DENTISTERIE</div>
-        <button type="button" class="btn-auth" id="btn-auth" onclick="window.requestAdmin()">🔒 ADMIN / DATA MANAGER</button>
-        <button type="button" class="btn-excel admin-only" id="btn-export" onclick="window.exportToCSV()">📊 EXPORT CSV</button>
-    </div>
 
-    <div id="content-1" class="form-content active">
-        <h2 style="color:#0277bd; font-size: 18px; text-align:center; margin-bottom: 25px;">Étude rétrospective sur la prévalence des indications de l’extraction dentaire à l’Hôpital Général de Makala</h2>
-        
-        <form id="dentalForm">
-            <div class="section-title">I. IDENTIFICATION DU DOSSIER</div>
-            <div class="row">
-                <div class="field">
-                    <label>Numéro du dossier (ID)</label>
-                    <input type="text" id="id-dossier" placeholder="Ex: EXT-2024-001">
+    <div id="tab-collecte" class="page active">
+        <div class="card">
+            <h2 style="margin-top:0">Fiche d'enquête : Extraction Dentaire</h2>
+            <p style="color:#7f8c8d; font-size: 14px;">Veuillez remplir les informations issues du dossier patient de l'HGR Makala.</p>
+            
+            <form id="extractionForm">
+                <div class="section-header">I. Identification & Chronologie</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Numéro de Dossier (ID)</label>
+                        <input type="text" id="id_dossier" placeholder="Ex: 2024-EXT-001" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Date de Consultation</label>
+                        <input type="date" id="date_consultation" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Nom de l'Enquêteur</label>
+                        <input type="text" id="enqueteur" placeholder="Prénom Nom">
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Date de consultation</label>
-                    <input type="date" id="date-consultation">
-                </div>
-            </div>
 
-            <div class="section-title">II. DONNÉES SOCIODÉMOGRAPHIQUES</div>
-            <div class="row">
-                <div class="field">
-                    <label>Âge (ans)</label>
-                    <input type="number" id="age" min="1" max="100" placeholder="Ex: 35">
+                <div class="section-header">II. Profil Sociodémographique</div>
+                <div class="grid-3">
+                    <div class="form-group">
+                        <label>Âge du Patient (ans)</label>
+                        <input type="number" id="age" min="1" max="110">
+                    </div>
+                    <div class="form-group">
+                        <label>Sexe</label>
+                        <select id="sexe">
+                            <option value="1">1. Masculin</option>
+                            <option value="2">2. Féminin</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Profession</label>
+                        <input type="text" id="profession" placeholder="Secteur d'activité">
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Sexe</label>
-                    <select id="sexe">
-                        <option value="M">1 = Masculin</option>
-                        <option value="F">2 = Féminin</option>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Profession</label>
-                    <input type="text" id="profession" placeholder="Ex: Enseignant, Sans emploi...">
-                </div>
-            </div>
-            <div class="row">
-                <div class="field">
-                    <label>Lieu de résidence</label>
-                    <input type="text" id="residence" placeholder="Commune de...">
-                </div>
-            </div>
 
-            <div class="section-title">III. DONNÉES CLINIQUES</div>
-            <div class="row">
-                <div class="field">
-                    <label>Motif de consultation</label>
-                    <input type="text" id="motif" placeholder="Douleur, gonflement, esthétique...">
+                <div class="section-header">III. Examen Clinique & Localisation</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Motif de consultation</label>
+                        <textarea id="motif" rows="2" placeholder="Description de la plainte..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Arcade concernée</label>
+                        <select id="arcade">
+                            <option value="1">1. Maxillaire (Haut)</option>
+                            <option value="2">2. Mandibulaire (Bas)</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Dent concernée (Numéro ISO)</label>
-                    <select id="dent">
-                        <option value="" disabled selected>Choisir la dent...</option>
-                        <optgroup label="Maxillaire Droit (Q1)">
-                            <option value="18">18 (Sagesse)</option><option value="17">17</option><option value="16">16</option><option value="15">15</option><option value="14">14</option><option value="13">13</option><option value="12">12</option><option value="11">11</option>
-                        </optgroup>
-                        <optgroup label="Maxillaire Gauche (Q2)">
-                            <option value="21">21</option><option value="22">22</option><option value="23">23</option><option value="24">24</option><option value="25">25</option><option value="26">26</option><option value="27">27</option><option value="28">28</option>
-                        </optgroup>
-                        <optgroup label="Mandibulaire Gauche (Q3)">
-                            <option value="31">31</option><option value="32">32</option><option value="33">33</option><option value="34">34</option><option value="35">35</option><option value="36">36</option><option value="37">37</option><option value="38">38</option>
-                        </optgroup>
-                        <optgroup label="Mandibulaire Droit (Q4)">
-                            <option value="41">41</option><option value="42">42</option><option value="43">43</option><option value="44">44</option><option value="45">45</option><option value="46">46</option><option value="47">47</option><option value="48">48</option>
-                        </optgroup>
-                    </select>
-                </div>
-                <div class="field">
-                    <label>Arcade</label>
-                    <select id="arcade">
-                        <option value="Maxillaire">1 = Maxillaire (Haut)</option>
-                        <option value="Mandibulaire">2 = Mandibulaire (Bas)</option>
-                    </select>
-                </div>
-            </div>
+                
+                <p style="font-weight: bold; font-size: 13px; margin: 15px 0 5px 0;">Sélectionner la dent (Numérotation ISO) :</p>
+                <div class="dental-grid" id="tooth-selector">
+                    </div>
 
-            <div class="section-title">IV. INDICATION DE L’EXTRACTION (INDIC)</div>
-            <div class="row" style="background:#e3f2fd; padding:15px; border-radius:8px;">
-                <div class="field">
-                    <label style="color:#01579b; font-size:15px;">Diagnostic Principal :</label>
-                    <select id="indication" style="font-weight:bold; color:#333;">
-                        <option value="" disabled selected>Sélectionner la cause...</option>
-                        <option value="Carie avancée">1 = Carie avancée (Délabrement)</option>
-                        <option value="Complication pulpo-périapicale">2 = Complication pulpo-périapicale</option>
-                        <option value="Maladie parodontale">3 = Maladie parodontale (Mobilité)</option>
-                        <option value="Dent incluse/enclavée">4 = Dent incluse/enclavée</option>
-                        <option value="Traumatisme dentaire">5 = Traumatisme dentaire</option>
-                        <option value="Indication orthodontique">6 = Indication orthodontique</option>
-                        <option value="Autres">7 = Autres</option>
-                    </select>
+                <div class="section-header">IV. Indications (Codification Extraction)</div>
+                <div class="grid-2">
+                    <div class="form-group" style="background: #f0f7f9; padding: 20px; border-radius: 12px; border: 1px solid var(--primary);">
+                        <label style="color: var(--primary); font-size: 14px;">Indication principale (Codifiée)</label>
+                        <select id="indication" style="border: 2px solid var(--primary);">
+                            <option value="1">1. Carie avancée (Délabrement)</option>
+                            <option value="2">2. Complication pulpo-périapicale</option>
+                            <option value="3">3. Maladie parodontale (Mobilité)</option>
+                            <option value="4">4. Dent incluse/enclavée</option>
+                            <option value="5">5. Traumatisme dentaire</option>
+                            <option value="6">6. Indication orthodontique</option>
+                            <option value="7">7. Autres causes</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Examens Complémentaires</label>
+                        <div style="display:flex; gap:20px; align-items:center; height:100%;">
+                            <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+                                <input type="radio" name="radio_bool" value="1"> Radiographie réalisée
+                            </label>
+                            <label style="display:flex; align-items:center; gap:8px; font-weight:normal;">
+                                <input type="radio" name="radio_bool" value="0" checked> Aucune radio
+                            </label>
+                        </div>
+                    </div>
                 </div>
-            </div>
 
-            <div class="section-title">V. EXAMENS & TYPE D'ACTE</div>
-            <div class="row">
-                <div class="field">
-                    <label>Radiographie Prise ?</label>
-                    <select id="radio">
-                        <option value="Non">0 = Non</option>
-                        <option value="Oui">1 = Oui</option>
-                    </select>
+                <div class="section-header">V. Procédure & Complications</div>
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label>Type d'extraction</label>
+                        <select id="type_ext">
+                            <option value="1">1. Simple</option>
+                            <option value="2">2. Chirurgicale (Alvéolectomie)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Complications post-opératoires</label>
+                        <select id="complication">
+                            <option value="0">0. Aucune</option>
+                            <option value="1">1. Hémorragie</option>
+                            <option value="2">2. Infection / Abcès</option>
+                            <option value="3">3. Alvéolite</option>
+                            <option value="4">4. Autres</option>
+                        </select>
+                    </div>
                 </div>
-                <div class="field">
-                    <label>Type d'Extraction</label>
-                    <select id="type-ext">
-                        <option value="Simple">1 = Simple</option>
-                        <option value="Chirurgicale">2 = Chirurgicale (Alvéolectomie/Séparation)</option>
-                    </select>
-                </div>
-            </div>
 
-            <div class="section-title">VII. COMPLICATIONS POST-OP</div>
-            <div class="row">
-                <div class="field">
-                    <label>Complication immédiate/secondaire</label>
-                    <select id="complication">
-                        <option value="Aucune">0 = Aucune</option>
-                        <option value="Hémorragie">1 = Hémorragie</option>
-                        <option value="Infection">2 = Infection</option>
-                        <option value="Alvéolite">3 = Alvéolite</option>
-                        <option value="Autres">4 = Autres</option>
-                    </select>
+                <div style="margin-top:40px; text-align: right;">
+                    <button type="button" class="btn-main" onclick="saveData()">💾 ENREGISTRER DANS LA BASE</button>
                 </div>
-                <div class="field">
-                    <label>Nom de l'enquêteur</label>
-                    <input type="text" id="enqueteur" value="Dr Stagiaire">
-                </div>
-            </div>
-
-            <button type="button" id="save-btn" class="btn-save" onclick="window.saveRecord()">💾 ENREGISTRER LA FICHE</button>
-        </form>
-    </div>
-
-    <div id="content-2" class="form-content">
-        <div class="section-title">MATRICE DE DÉPOUILLEMENT (N = <span id="n-total">0</span>)</div>
-        <button id="btn-delete-multi" class="btn-delete-selected" onclick="window.deleteSelected()">🗑️ Supprimer la sélection</button>
-        <div style="overflow-x:auto;">
-            <table>
-                <thead>
-                    <tr>
-                        <th><input type="checkbox" id="select-all" onclick="window.toggleSelectAll(this)"></th>
-                        <th>ID</th>
-                        <th>Age/Sexe</th>
-                        <th>Dent</th>
-                        <th>Indication (Cause)</th>
-                        <th>Type Ext.</th>
-                        <th>Complication</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody id="database-body"></tbody>
-            </table>
+            </form>
         </div>
     </div>
 
-    <div id="content-3" class="form-content">
-        <div class="section-title">1. PRÉVALENCE DES INDICATIONS (Motif principal)</div>
-        <div class="stat-card">
-            <div class="stat-title">Distribution des causes d'extraction (n=<span id="stat-n"></span>)</div>
-            <div id="graph-indications"></div>
-            [span_2](start_span)<p style="font-size:12px; color:#666;">Ce graphique montre la fréquence des pathologies menant à l'extraction[span_2](end_span).</p>
+    <div id="tab-matrice" class="page">
+        <div class="card">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h3 style="margin:0">Matrice de codification (N=<span id="total-count">0</span>)</h3>
+                <button class="btn-main" style="padding:10px 20px; font-size:13px; background:#2ecc71;" onclick="exportCSV()">📥 EXPORT CSV (EXCEL)</button>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="data-table">
+                    <thead>
+                        <tr>
+                            <th>ID Dossier</th>
+                            <th>Âge</th>
+                            <th>Sexe</th>
+                            <th>Indication (Code)</th>
+                            <th>Dent</th>
+                            <th>Type Acte</th>
+                            <th>Complication</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body">
+                        </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="tab-analyse" class="page">
+        <div class="stat-grid">
+            <div class="stat-box">
+                <div class="stat-number" id="stat-n">0</div>
+                <div class="stat-label">Extractions totales</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="stat-carie">0%</div>
+                <div class="stat-label">Prévalence Caries</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="stat-comp">0%</div>
+                <div class="stat-label">Taux Complications</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-number" id="stat-sexe">0</div>
+                <div class="stat-label">Ratio Homme/Femme</div>
+            </div>
         </div>
 
-        <div class="row">
-            <div class="stat-card">
-                <div class="stat-title">2. [span_3](start_span)Type d'Extraction[span_3](end_span)</div>
-                <div id="graph-type"></div>
+        <div class="grid-2">
+            <div class="card">
+                <h4>Distribution des Indications</h4>
+                <div class="chart-container" id="chart-indications">
+                    </div>
             </div>
-            <div class="stat-card">
-                <div class="stat-title">3. [span_4](start_span)Taux de Complications[span_4](end_span)</div>
-                <div id="graph-comps"></div>
+            <div class="card">
+                <h4>Types d'Extractions</h4>
+                <div class="chart-container" id="chart-types">
+                    </div>
             </div>
         </div>
+    </div>
 
-        <div class="section-title">4. ANALYSE CROISÉE : AGE vs INDICATION</div>
-        <table style="width:100%; border: 1px solid #eee; background: white;">
-            <thead style="background: #0277bd; color: white;">
-                <tr>
-                    [span_5](start_span)<th style="text-align:left; padding:15px;">GROUPE D'ÂGE[span_5](end_span)</th>
-                    <th>Indication Dominante</th>
-                    <th>Fréquence Dominante</th>
-                </tr>
-            </thead>
-            <tbody id="cross-body"></tbody>
-        </table>
+    <div id="tab-rapport" class="page">
+        <div class="card">
+            <h3>Synthèse & Recommandations</h3>
+            <div id="report-content" style="line-height:1.6;">
+                <p>Veuillez entrer des données pour générer le rapport automatique.</p>
+            </div>
+        </div>
     </div>
 
 </div>
 
-<div id="detailModal" class="modal-overlay" onclick="window.closeModal(event)">
-    <div class="modal-content">
-        <div class="modal-header" style="display:flex; justify-content:space-between; border-bottom:1px solid #eee; padding-bottom:10px;">
-            <h3 style="margin:0; color:#0277bd;">Détail Dossier</h3>
-            <span style="cursor:pointer; font-size:20px;" onclick="window.closeModalBtn()">&times;</span>
-        </div>
-        <div id="modal-body-content" style="margin-top:15px;"></div>
-    </div>
-</div>
+<script>
+    // --- INITIALISATION DES DONNÉES ---
+    let db = JSON.parse(localStorage.getItem('dentalDB')) || [];
+    let selectedTooth = null;
 
-<div id="toast">Fiche enregistrée !</div>
+    // --- LOGIQUE UI ---
+    function openTab(evt, tabName) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById(tabName).classList.add('active');
+        evt.currentTarget.classList.add('active');
+        if(tabName === 'tab-analyse') updateCharts();
+        if(tabName === 'tab-rapport') generateReport();
+    }
 
-<script type="module">
-    // --- MODE SIMULATION (Données Dentaires Réalistes) ---
-    let database = []; 
-    let isAdmin = false;
+    // Générateur de grille dentaire ISO
+    const selector = document.getElementById('tooth-selector');
+    const teeth = [18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28, 48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38];
+    
+    teeth.forEach(t => {
+        const btn = document.createElement('div');
+        btn.className = 'tooth-btn';
+        btn.innerText = t;
+        btn.onclick = () => {
+            document.querySelectorAll('.tooth-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
+            selectedTooth = t;
+        };
+        selector.appendChild(btn);
+    });
 
-    window.generateSimulatedData = function() {
-        let simulatedDB = [];
-        const professions = ["Etudiant", "Commerçant", "Sans emploi", "Fonctionnaire", "Chauffeur", "Cultivateur"];
-        const residences = ["Makala", "Ngaba", "Lemba", "Kalamu", "Selembao"];
-        
-        // Génération de 200 cas fictifs basés sur l'épidémiologie courante à Kinshasa
-        for (let i = 1; i <= 200; i++) {
-            let age = Math.floor(Math.random() * 75) + 5; // 5 à 80 ans
-            let sexe = Math.random() > 0.45 ? "F" : "M"; // Légère prédominance féminine souvent observée
-            
-            // Logique Clinique (Intelligence simulée)
-            let indication, dent, typeExt, complication, radio;
-            let typeExtCode = "Simple";
-            
-            // Déterminer l'indication selon l'âge
-            let randIndic = Math.random();
-            if (age < 15) {
-                // Enfants : Carie ou Ortho
-                indication = randIndic > 0.7 ? "Indication orthodontique" : "Carie avancée";
-                dent = [51,52,53,54,55,61,62,63,64,65,71,72,73,74,75,81,82,83,84,85][Math.floor(Math.random()*20)]; // Dents lactéales (simplifié)
-            } else if (age > 15 && age < 30) {
-                // Jeunes adultes : Dents de sagesse (incluses) ou Carie
-                if (randIndic > 0.6) {
-                    indication = "Dent incluse/enclavée";
-                    dent = [18, 28, 38, 48][Math.floor(Math.random()*4)];
-                    typeExtCode = "Chirurgicale";
-                } else {
-                    indication = "Carie avancée";
-                    dent = Math.floor(Math.random() * 32) + 11;
-                }
-            } else {
-                // Adultes/Vieux : Paro ou Carie terminale
-                if (randIndic > 0.6) {
-                    indication = "Maladie parodontale";
-                } else {
-                    indication = "Carie avancée"; // Reste la cause #1
-                }
-                dent = Math.floor(Math.random() * 32) + 11;
-            }
+    // --- FONCTIONS DATA ---
+    function saveData() {
+        const formData = {
+            id: document.getElementById('id_dossier').value,
+            date: document.getElementById('date_consultation').value,
+            age: parseInt(document.getElementById('age').value),
+            sexe: document.getElementById('sexe').value,
+            prof: document.getElementById('profession').value,
+            dent: selectedTooth,
+            indication: document.getElementById('indication').value,
+            type: document.getElementById('type_ext').value,
+            comp: document.getElementById('complication').value,
+            radio: document.querySelector('input[name="radio_bool"]:checked').value
+        };
 
-            // Complications (Plus rares)
-            let randComp = Math.random();
-            if (randComp > 0.90) complication = "Alvéolite";
-            else if (randComp > 0.95) complication = "Hémorragie";
-            else complication = "Aucune";
-
-            // Radio : Souvent Oui pour Incluses/Chirurgie
-            radio = (typeExtCode === "Chirurgicale" || indication === "Complication pulpo-périapicale") ? "Oui" : (Math.random() > 0.7 ? "Oui" : "Non");
-
-            simulatedDB.push({
-                id: "EXT-" + i.toString().padStart(3, '0'),
-                date: "2023-" + (Math.floor(Math.random()*12)+1).toString().padStart(2,'0') + "-15",
-                age: age,
-                sexe: sexe,
-                prof: professions[Math.floor(Math.random() * professions.length)],
-                resid: residences[Math.floor(Math.random() * residences.length)],
-                motif: "Douleur",
-                dent: dent,
-                arcade: (dent >= 11 && dent <= 28) ? "Maxillaire" : "Mandibulaire",
-                indication: indication,
-                radio: radio,
-                typeExt: typeExtCode,
-                complication: complication,
-                enqueteur: "Dr Simul"
-            });
-        }
-        return simulatedDB;
-    };
-
-    // Chargement initial
-    database = window.generateSimulatedData();
-    setTimeout(() => {
-        window.updateUI();
-        showToast("200 Dossiers dentaires chargés (Simulation Makala)");
-    }, 500);
-
-    // --- LOGIQUE METIER ---
-
-    window.requestAdmin = function() {
-        if(isAdmin) return; 
-        let code = prompt("Code Chef de Service (ex: makala) :"); 
-        if(code === "makala") {
-            isAdmin = true;
-            document.querySelectorAll('.admin-only').forEach(el => {
-                el.classList.add('admin-visible');
-            });
-            document.getElementById('btn-auth').style.display = 'none';
-            alert("Accès validé. Vous pouvez voir la Matrice et les Stats.");
-            window.switchTab(3); // Aller direct aux stats
-        } else {
-            alert("Code incorrect !");
-        }
-    };
-
-    window.saveRecord = function() {
-        [span_6](start_span)// Récupération des champs[span_6](end_span)
-        let id = document.getElementById('id-dossier').value;
-        let indic = document.getElementById('indication').value;
-        let dent = document.getElementById('dent').value;
-
-        if(!id || !indic || !dent) {
-            alert("Erreur : ID, Dent et Indication sont obligatoires !");
+        if(!formData.id || !formData.dent) {
+            alert("Veuillez remplir au moins l'ID du dossier et choisir une dent.");
             return;
         }
 
-        const newEntry = {
-            id: id,
-            date: document.getElementById('date-consultation').value,
-            age: document.getElementById('age').value,
-            sexe: document.getElementById('sexe').value,
-            prof: document.getElementById('profession').value,
-            resid: document.getElementById('residence').value,
-            motif: document.getElementById('motif').value,
-            dent: dent,
-            arcade: document.getElementById('arcade').value,
-            indication: indic,
-            radio: document.getElementById('radio').value,
-            typeExt: document.getElementById('type-ext').value,
-            complication: document.getElementById('complication').value,
-            enqueteur: document.getElementById('enqueteur').value
-        };
-
-        database.unshift(newEntry); // Ajouter au début
-        window.updateUI();
-        showToast("Fiche ajoutée avec succès !");
-        document.getElementById('dentalForm').reset();
-    };
-
-    // Suppression & Gestion
-    window.deleteOne = function(index) {
-        if(confirm("Supprimer ce dossier ?")) {
-            database.splice(index, 1);
-            updateUI();
-        }
-    };
-
-    window.deleteSelected = function() {
-        if(!confirm("Confirmer la suppression multiple ?")) return;
-        const checkboxes = Array.from(document.querySelectorAll('.row-check'));
-        for (let i = checkboxes.length - 1; i >= 0; i--) {
-            if (checkboxes[i].checked) database.splice(i, 1);
-        }
-        updateUI();
-    };
-
-    window.toggleSelectAll = function(source) {
-        document.querySelectorAll('.row-check').forEach(cb => cb.checked = source.checked);
-        window.toggleDeleteButton();
-    };
-
-    window.toggleDeleteButton = function() {
-        const checked = document.querySelectorAll('.row-check:checked').length;
-        document.getElementById('btn-delete-multi').style.display = checked > 0 ? 'block' : 'none';
-    };
-
-    window.viewDetails = function(index) {
-        let d = database[index];
-        let html = `
-            <div class="detail-row"><span>ID Dossier</span><b>${d.id}</b></div>
-            <div class="detail-row"><span>Date</span><span>${d.date}</span></div>
-            <div class="detail-row"><span>Patient</span><span>${d.age} ans / ${d.sexe}</span></div>
-            <div class="detail-row"><span>Résidence</span><span>${d.resid}</span></div>
-            <br>
-            <strong style="color:#0277bd">DONNÉES CLINIQUES</strong>
-            <div class="detail-row"><span>Dent</span><b>#${d.dent} (${d.arcade})</b></div>
-            <div class="detail-row"><span>Indication</span><b>${d.indication}</b></div>
-            <div class="detail-row"><span>Radio</span><span>${d.radio}</span></div>
-            <div class="detail-row"><span>Type Extraction</span><span>${d.typeExt}</span></div>
-            <div class="detail-row" style="background:#ffebee"><span>Complication</span><b style="color:#c62828">${d.complication}</b></div>
-        `;
-        document.getElementById('modal-body-content').innerHTML = html;
-        document.getElementById('detailModal').style.display = 'flex';
-    };
-
-    window.closeModal = function(e) { if(e.target.id === 'detailModal') document.getElementById('detailModal').style.display = 'none'; };
-    window.closeModalBtn = function() { document.getElementById('detailModal').style.display = 'none'; };
-
-    // --- VISUALISATION & MISE A JOUR ---
-    window.updateUI = function() {
-        document.getElementById('count-badge').textContent = database.length;
-        document.getElementById('n-total').textContent = database.length;
-        document.getElementById('stat-n').textContent = database.length;
-
-        // Remplir le tableau
-        const tbody = document.getElementById('database-body');
-        let displayData = database.slice(0, 50); // Afficher les 50 derniers pour la perf
-        
-        tbody.innerHTML = displayData.map((row, index) => `
-            <tr>
-                <td><input type="checkbox" class="row-check" onclick="window.toggleDeleteButton()"></td>
-                <td><b>${row.id}</b></td>
-                <td>${row.age} ans (${row.sexe})</td>
-                <td>#${row.dent}</td>
-                <td>${row.indication}</td>
-                <td><span style="padding:2px 6px; border-radius:4px; background:${row.typeExt === 'Chirurgicale' ? '#fff3e0' : '#e8f5e9'}">${row.typeExt}</span></td>
-                <td style="color:${row.complication !== 'Aucune' ? 'red' : 'green'}">${row.complication}</td>
-                <td>
-                    <button class="btn-view-single" onclick="window.viewDetails(${index})">Voir</button>
-                    <button class="btn-view-single" style="color:red; border-color:red;" onclick="window.deleteOne(${index})">X</button>
-                </td>
-            </tr>
-        `).join('');
-
-        if(isAdmin) window.updateAnalytics();
-    };
-
-    window.updateAnalytics = function() {
-        if(database.length === 0) return;
-
-        [span_7](start_span)// 1. Graphique Indications[span_7](end_span)
-        let indicMap = {};
-        database.forEach(r => indicMap[r.indication] = (indicMap[r.indication]||0)+1);
-        let sortedIndic = Object.entries(indicMap).sort((a,b) => b[1] - a[1]);
-        
-        document.getElementById('graph-indications').innerHTML = sortedIndic.map(([k,v]) => {
-            let p = Math.round((v/database.length)*100);
-            return `<div class="bar-container"><div class="bar-label">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${p}%; background:#0277bd;">${p}%</div></div><div class="bar-value">${v}</div></div>`;
-        }).join('');
-
-        [span_8](start_span)// 2. Type d'extraction[span_8](end_span)
-        let typeS = database.filter(r => r.typeExt === 'Simple').length;
-        let typeC = database.filter(r => r.typeExt === 'Chirurgicale').length;
-        document.getElementById('graph-type').innerHTML = `
-            <div class="bar-container"><div class="bar-label">Simple</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(typeS/database.length*100)}%; background:#4caf50;">${Math.round(typeS/database.length*100)}%</div></div></div>
-            <div class="bar-container"><div class="bar-label">Chirurgicale</div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(typeC/database.length*100)}%; background:#ff9800;">${Math.round(typeC/database.length*100)}%</div></div></div>
-        `;
-
-        [span_9](start_span)// 3. Complications[span_9](end_span)
-        let compMap = {};
-        database.forEach(r => compMap[r.complication] = (compMap[r.complication]||0)+1);
-        delete compMap["Aucune"]; // On montre juste les problèmes
-        document.getElementById('graph-comps').innerHTML = Object.entries(compMap).length > 0 ? Object.entries(compMap).map(([k,v]) => {
-            let p = Math.round((v/database.length)*100);
-            return `<div class="bar-container"><div class="bar-label" style="color:#c62828">${k}</div><div class="bar-track"><div class="bar-fill" style="width:${Math.max(p, 5)}%; background:#c62828;">${p}%</div></div><div class="bar-value">${v}</div></div>`;
-        }).join('') : "<p>Aucune complication enregistrée.</p>";
-
-        // 4. Analyse Croisée (Age vs Indication)
-        // Groupes : Enfants (<15), Jeunes (15-35), Adultes (36-55), Vieux (>55)
-        let groups = [
-            {l: "Enfants (<15 ans)", filter: r => r.age < 15},
-            {l: "Jeunes (15-35 ans)", filter: r => r.age >= 15 && r.age <= 35},
-            {l: "Adultes (36-55 ans)", filter: r => r.age > 35 && r.age <= 55},
-            {l: "Seniors (>55 ans)", filter: r => r.age > 55}
-        ];
-
-        document.getElementById('cross-body').innerHTML = groups.map(g => {
-            let subset = database.filter(g.filter);
-            if(subset.length === 0) return `<tr><td>${g.l}</td><td colspan="2">-</td></tr>`;
-            
-            // Trouver l'indication top pour ce groupe
-            let counts = {};
-            subset.forEach(r => counts[r.indication] = (counts[r.indication]||0)+1);
-            let top = Object.entries(counts).sort((a,b)=>b[1]-a[1])[0];
-            
-            return `<tr>
-                <td style="padding:10px; border-bottom:1px solid #eee;"><b>${g.l}</b> (n=${subset.length})</td>
-                <td style="padding:10px; border-bottom:1px solid #eee; color:#0277bd;">${top[0]}</td>
-                <td style="padding:10px; border-bottom:1px solid #eee;">${Math.round((top[1]/subset.length)*100)}% du groupe</td>
-            </tr>`;
-        }).join('');
-    };
-
-    // --- UTILITAIRES ---
-    window.switchTab = function(i) {
-        document.querySelectorAll('.form-content').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-        document.getElementById('content-'+i).classList.add('active');
-        document.querySelectorAll('.tab')[i-1].classList.add('active');
-    };
-
-    function showToast(message) {
-        var x = document.getElementById("toast");
-        x.className = "show";
-        x.innerText = message;
-        setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+        db.push(formData);
+        localStorage.setItem('dentalDB', JSON.stringify(db));
+        updateTable();
+        alert("Données enregistrées avec succès !");
+        document.getElementById('extractionForm').reset();
+        document.querySelectorAll('.tooth-btn').forEach(b => b.classList.remove('selected'));
     }
 
-    window.exportToCSV = function() {
-        let csvContent = "data:text/csv;charset=utf-8,";
-        csvContent += "ID,Date,Age,Sexe,Profession,Residence,Motif,Dent,Arcade,Indication,Radio,TypeExtraction,Complication\n";
-        database.forEach(r => {
-            let row = `${r.id},${r.date},${r.age},${r.sexe},"${r.prof}","${r.resid}","${r.motif}",${r.dent},${r.arcade},"${r.indication}",${r.radio},${r.typeExt},"${r.complication}"`;
-            csvContent += row + "\n";
+    function updateTable() {
+        const tbody = document.getElementById('table-body');
+        document.getElementById('total-count').innerText = db.length;
+        tbody.innerHTML = db.map(row => `
+            <tr>
+                <td><b>${row.id}</b></td>
+                <td>${row.age} ans</td>
+                <td>${row.sexe == 1 ? 'M' : 'F'}</td>
+                <td><span class="badge badge-blue">Indic. ${row.indication}</span></td>
+                <td>Tooth #${row.dent}</td>
+                <td>${row.type == 1 ? 'Simple' : 'Chirurgicale'}</td>
+                <td style="color:${row.comp != 0 ? '#e67e22' : '#27ae60'}">${row.comp != 0 ? 'Oui (Code '+row.comp+')' : 'Néant'}</td>
+            </tr>
+        `).join('');
+    }
+
+    function updateCharts() {
+        const n = db.length;
+        if(n === 0) return;
+
+        document.getElementById('stat-n').innerText = n;
+        
+        // Calcul prévalence carie (Code 1)
+        const caries = db.filter(r => r.indication == 1).length;
+        document.getElementById('stat-carie').innerText = Math.round((caries/n)*100) + "%";
+
+        // Complications
+        const comps = db.filter(r => r.comp != 0).length;
+        document.getElementById('stat-comp').innerText = Math.round((comps/n)*100) + "%";
+
+        // Graphique Indications
+        const indicLabels = ["Carie", "Pulpo-Péri", "Parodont.", "Incluses", "Trauma", "Ortho", "Autres"];
+        const indicData = [1,2,3,4,5,6,7].map(code => db.filter(r => r.indication == code).length);
+        const maxVal = Math.max(...indicData, 1);
+
+        document.getElementById('chart-indications').innerHTML = indicData.map((val, i) => `
+            <div class="bar" style="height: ${(val/maxVal)*100}%">
+                <div class="bar-label">${val}</div>
+                <div class="bar-name">${indicLabels[i]}</div>
+            </div>
+        `).join('');
+    }
+
+    function generateReport() {
+        if(db.length === 0) return;
+        const mainCause = [1,2,3,4,5,6,7].map(c => ({c, count: db.filter(r => r.indication == c).length}))
+                            .sort((a,b) => b.count - a.count)[0];
+        
+        const causes = ["Carie", "Complication pulpaire", "Parodontopathie", "Dents incluses", "Traumatisme", "Orthodontie", "Autres"];
+
+        document.getElementById('report-content').innerHTML = `
+            <div style="background:#f9fafb; padding:20px; border-radius:10px; border-left:4px solid #0277bd;">
+                <p><strong>Conclusion Statistique :</strong> Sur un échantillon de ${db.length} extractions, la cause prédominante à l'HGR Makala est <strong>${causes[mainCause.c - 1]}</strong> (${mainCause.count} cas).</p>
+                <p><strong>Recommandation 1 :</strong> Renforcer la prévention primaire de la carie dentaire par des campagnes de sensibilisation au sein de la zone de santé de Makala.</p>
+                <p><strong>Recommandation 2 :</strong> Améliorer le plateau technique pour la prise en charge des complications (actuellement ${Math.round((db.filter(r=>r.comp!=0).length/db.length)*100)}% des cas).</p>
+            </div>
+        `;
+    }
+
+    function exportCSV() {
+        let csv = "ID;Age;Sexe;Indication;Dent;Type;Complication;Radio\n";
+        db.forEach(r => {
+            csv += `${r.id};${r.age};${r.sexe};${r.indication};${r.dent};${r.type};${r.comp};${r.radio}\n`;
         });
-        const encodedUri = encodeURI(csvContent);
-        const link = document.createElement("a");
-        link.setAttribute("href", encodedUri);
-        link.setAttribute("download", "Makala_Extraction_Data.csv");
-        document.body.appendChild(link);
-        link.click();
-    };
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.setAttribute('hidden', '');
+        a.setAttribute('href', url);
+        a.setAttribute('download', 'donnees_makala_extraction.csv');
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
+
+    // Init au chargement
+    updateTable();
 </script>
 
 </body>
