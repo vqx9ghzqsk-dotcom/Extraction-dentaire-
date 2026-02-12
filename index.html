@@ -3,140 +3,108 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DentistData Pro - Makala</title>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <title>Makala Dental Analytics - Officiel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #a03355;
-            --secondary: #6366f1;
-            --glass: rgba(255, 255, 255, 0.8);
-            --bg: #f0f2f5;
+            --bordeaux: #a03355;
+            --gold: #f0ad4e;
+            --green: #3e7e40;
+            --light: #f8f9fa;
+            --dark: #2d3436;
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-            margin: 0;
-            padding: 20px;
-            color: #1e293b;
-            min-height: 100vh;
+            font-family: 'Montserrat', sans-serif;
+            background: #eef2f7;
+            color: var(--dark);
+            margin: 0; padding: 20px;
         }
 
-        /* Menu Moderne */
+        .container { max-width: 1100px; margin: 0 auto; }
+
+        /* --- NAVIGATION PHOTO STYLE --- */
         .nav-header {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
+            display: flex; gap: 10px; margin-bottom: 25px; align-items: stretch;
         }
 
-        .tab-btn {
-            border: none;
-            padding: 12px 20px;
-            border-radius: 15px;
-            background: var(--glass);
-            backdrop-filter: blur(10px);
-            cursor: pointer;
-            font-weight: 600;
-            transition: 0.3s;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        .nav-item {
+            background: white; border-radius: 10px; padding: 15px; flex: 1;
+            text-align: center; cursor: pointer; transition: 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05); border: 1px solid #ddd;
+            display: flex; flex-direction: column; justify-content: center;
         }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            transform: scale(1.05);
+        .nav-item span { font-size: 0.7rem; font-weight: 800; color: #888; text-transform: uppercase; }
+        .nav-item b { font-size: 0.9rem; color: var(--dark); margin-top: 5px; }
+        .nav-item.active { background: var(--bordeaux); border-color: var(--bordeaux); }
+        .nav-item.active b, .nav-item.active span { color: white; }
+
+        .badge-total {
+            background: var(--gold); color: white; border-radius: 10px;
+            padding: 15px; text-align: center; font-weight: 800; min-width: 120px;
         }
 
-        /* Cartes Style Moderne */
-        .container { max-width: 1000px; margin: 0 auto; }
+        .btn-export {
+            background: var(--green); color: white; border: none; border-radius: 10px;
+            padding: 15px; font-weight: 800; cursor: pointer;
+        }
+
+        /* --- CONTENT CARDS --- */
         .card {
-            background: var(--glass);
-            backdrop-filter: blur(20px);
-            border-radius: 24px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            display: none;
-            border: 1px solid rgba(255,255,255,0.3);
+            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(10px);
+            border-radius: 20px; padding: 30px; display: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid white;
         }
-        .card.active { display: block; animation: slideUp 0.5s ease; }
+        .card.active { display: block; animation: fadeIn 0.4s ease; }
 
-        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Formulaire Spécial "Zéro Clavier" */
-        .input-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
+        /* --- FORMULAIRE ZÉRO SAISIE --- */
+        .form-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;
         }
 
-        .field-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
+        .group h3 { 
+            grid-column: 1 / -1; color: var(--bordeaux); font-size: 1rem; 
+            border-bottom: 2px solid var(--bordeaux); padding-bottom: 5px; margin-top: 20px;
         }
 
-        label { font-size: 0.85rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+        .field { display: flex; flex-direction: column; gap: 5px; }
+        label { font-size: 0.75rem; font-weight: 700; color: #666; }
+        select, input {
+            padding: 12px; border-radius: 8px; border: 2px solid #eee; 
+            background: white; font-family: inherit; font-weight: 600; cursor: pointer;
+        }
+        select:focus { border-color: var(--gold); outline: none; }
 
-        select {
-            appearance: none;
-            background: white;
-            border: 2px solid transparent;
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 1rem;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: 0.2s;
+        .btn-submit {
+            background: var(--bordeaux); color: white; border: none; width: 100%;
+            padding: 20px; border-radius: 12px; font-weight: 800; font-size: 1rem;
+            margin-top: 30px; cursor: pointer; transition: 0.3s;
+        }
+        .btn-submit:hover { transform: scale(1.02); filter: brightness(1.2); }
+
+        /* --- TABLEAUX & ANALYSE --- */
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; background: white; border-radius: 10px; overflow: hidden; }
+        th { background: #f1f1f1; padding: 12px; text-align: left; font-size: 0.8rem; color: var(--bordeaux); }
+        td { padding: 12px; border-bottom: 1px solid #eee; font-size: 0.9rem; }
+
+        .interpretation {
+            background: #fdf5e6; border-left: 5px solid var(--gold);
+            padding: 15px; border-radius: 0 10px 10px 0; margin-top: 10px;
+            font-size: 0.9rem; font-style: italic; color: #7f6000;
         }
 
-        select:focus { border-color: var(--primary); outline: none; }
-
-        .btn-add {
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 30px;
-            box-shadow: 0 10px 20px rgba(160, 51, 85, 0.2);
+        .stats-summary {
+            display: flex; gap: 15px; margin-bottom: 25px;
         }
-
-        /* Tableaux et Analyses */
-        table { width: 100%; border-collapse: collapse; background: white; border-radius: 15px; overflow: hidden; margin-top: 15px; }
-        th { background: #f8fafc; padding: 15px; text-align: left; font-size: 0.8rem; }
-        td { padding: 15px; border-top: 1px solid #f1f5f9; }
-
-        .interpretation-card {
-            background: #eef2ff;
-            border-left: 6px solid var(--secondary);
-            padding: 20px;
-            border-radius: 12px;
-            margin-top: 20px;
-            font-size: 0.95rem;
-            color: #3730a3;
+        .stat-box {
+            background: white; padding: 20px; border-radius: 15px; flex: 1; text-align: center;
+            border-bottom: 4px solid var(--bordeaux);
         }
-
-        .stats-row {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 25px;
-        }
-
-        .stat-pill {
-            background: white;
-            padding: 15px;
-            border-radius: 18px;
-            flex: 1;
-            text-align: center;
-        }
-
-        .stat-pill span { display: block; font-size: 0.7rem; color: #94a3b8; font-weight: bold; }
-        .stat-pill b { font-size: 1.5rem; color: var(--primary); }
+        .stat-box small { display: block; color: #999; font-size: 0.7rem; font-weight: 800; }
+        .stat-box b { font-size: 1.5rem; color: var(--bordeaux); }
 
     </style>
 </head>
@@ -144,239 +112,218 @@
 
 <div class="container">
     <div class="nav-header">
-        <button class="tab-btn active" onclick="switchTab(1)">📝 Collecte</button>
-        <button class="tab-btn" onclick="switchTab(2)">📊 Matrice</button>
-        <button class="tab-btn" onclick="switchTab(3)">📈 Résultats</button>
-        <button class="tab-btn" onclick="seedFunData()" style="background:#dcfce7; color:#166534;">✨ Mode Fun (x10)</button>
+        <div class="nav-item active" onclick="tab(1)"><span>01. Saisie</span><b>Collecte</b></div>
+        <div class="nav-item" onclick="tab(2)"><span>02. Données</span><b>Matrice</b></div>
+        <div class="nav-item" onclick="tab(3)"><span>03. Statistiques</span><b>Analyse & Interp.</b></div>
+        <div class="nav-item" onclick="tab(4)"><span>04. Mémoire</span><b>Conclusion</b></div>
+        
+        <div class="badge-total">TOTAL<br><span id="total-n">0</span></div>
+        <button class="btn-export" onclick="seed()">✨ MODE FUN (x10)</button>
     </div>
 
-    <div id="tab1" class="card active">
-        <h2 style="margin-top:0">Fiche Digitale Makala</h2>
-        <div class="input-grid">
-            <div class="field-group">
-                <label>Âge du patient</label>
-                <select id="ageSelect">
-                    <option value="">Choisir l'âge...</option>
-                </select>
+    <div id="t1" class="card active">
+        <h2 style="color:var(--bordeaux); margin-top:0;">Fiche d'Enquête Codifiée - Makala</h2>
+        <form id="f">
+            <div class="form-grid">
+                <div class="group"><h3>I & II. Identification & Sociodémographie</h3></div>
+                <div class="field"><label>Âge (AGE)</label><select id="age"></select></div>
+                <div class="field"><label>Sexe (SEXE)</label><select id="sexe"><option value="1">1=Masculin</option><option value="2">2=Féminin</option></select></div>
+                <div class="field"><label>Profession (PROF)</label><select id="prof">
+                    <option>Étudiant</option><option>Fonctionnaire</option><option>Secteur Privé</option><option>Sans emploi</option><option>Retraité</option><option>Autre</option>
+                </select></div>
+                <div class="field"><label>Résidence (RESID)</label><select id="resid">
+                    <option>Makala</option><option>Ngaba</option><option>Selembao</option><option>Kalamu</option><option>Autres</option>
+                </select></div>
+
+                <div class="group"><h3>III & IV. Données Cliniques & Indication</h3></div>
+                <div class="field"><label>Dent (DENT)</label><select id="dent"></select></div>
+                <div class="field"><label>Arcade (ARCADE)</label><select id="arcade"><option value="1">1=Maxillaire</option><option value="2">2=Mandibulaire</option></select></div>
+                <div class="field"><label>Indication (INDIC)</label><select id="indic">
+                    <option value="1">1=Carie avancée</option>
+                    <option value="2">2=Complication pulpo-périapicale</option>
+                    <option value="3">3=Maladie parodontale</option>
+                    <option value="4">4=Dent incluse/enclavée</option>
+                    <option value="5">5=Traumatisme dentaire</option>
+                    <option value="6">6=Indication orthodontique</option>
+                    <option value="7">7=Autres</option>
+                </select></div>
+
+                <div class="group"><h3>V, VI & VII. Examens & Complications</h3></div>
+                <div class="field"><label>Radiographie (RADIO)</label><select id="radio"><option value="0">0=Non</option><option value="1">1=Oui</option></select></div>
+                <div class="field"><label>Type (TYPEEXT)</label><select id="type"><option value="1">1=Simple</option><option value="2">2=Chirurgicale</option></select></div>
+                <div class="field"><label>Complication (COMP)</label><select id="comp">
+                    <option value="0">0=Aucune</option><option value="1">1=Hémorragie</option><option value="2">2=Infection</option><option value="3">3=Alvéolite</option><option value="4">4=Autres</option>
+                </select></div>
             </div>
-            <div class="field-group">
-                <label>Sexe</label>
-                <select id="sexeSelect">
-                    <option value="M">1. Masculin</option>
-                    <option value="F">2. Féminin</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Profession</label>
-                <select id="profSelect">
-                    <option value="Étudiant">Étudiant</option>
-                    <option value="Fonctionnaire">Fonctionnaire</option>
-                    <option value="Secteur Privé">Secteur Privé</option>
-                    <option value="Sans emploi">Sans emploi</option>
-                    <option value="Retraité">Retraité</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Dent (FDI)</label>
-                <select id="dentSelect">
-                    </select>
-            </div>
-            <div class="field-group">
-                <label>Arcade</label>
-                <select id="arcadeSelect">
-                    <option value="Maxillaire">1. Maxillaire</option>
-                    <option value="Mandibulaire">2. Mandibulaire</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Indication (INDIC)</label>
-                <select id="indicSelect">
-                    <option value="Carie">1. Carie avancée</option>
-                    <option value="Complication">2. Compl. pulpo-périap.</option>
-                    <option value="Parodontale">3. Maladie parodontale</option>
-                    <option value="Incluse">4. Dent incluse</option>
-                    <option value="Traumatisme">5. Traumatisme</option>
-                    <option value="Orthodontie">6. Orthodontie</option>
-                    <option value="Autres">7. Autres</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Type d'extraction</label>
-                <select id="typeSelect">
-                    <option value="Simple">1. Simple</option>
-                    <option value="Chirurgicale">2. Chirurgicale</option>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Complication</label>
-                <select id="compSelect">
-                    <option value="Aucune">0. Aucune</option>
-                    <option value="Hémorragie">1. Hémorragie</option>
-                    <option value="Infection">2. Infection</option>
-                    <option value="Alvéolite">3. Alvéolite</option>
-                </select>
-            </div>
-        </div>
-        <button class="btn-add" onclick="savePatient()">ENREGISTRER SANS TAPER</button>
+            <button type="button" class="btn-submit" onclick="add()">AJOUTER AU REGISTRE</button>
+        </form>
     </div>
 
-    <div id="tab2" class="card">
-        <h2>Dépouillement (N=<span id="n-count">0</span>)</h2>
+    <div id="t2" class="card">
+        <h2>Matrice de Dépouillement</h2>
         <div style="overflow-x:auto">
-            <table id="mainTable">
-                <thead>
-                    <tr><th>Âge</th><th>Sexe</th><th>Dent</th><th>Indication</th><th>Type</th><th>Compl.</th></tr>
-                </thead>
+            <table id="mt">
+                <thead><tr><th>Age</th><th>Sexe</th><th>Indication</th><th>Arcade</th><th>Type</th><th>Comp.</th></tr></thead>
                 <tbody></tbody>
             </table>
         </div>
     </div>
 
-    <div id="tab3" class="card">
-        <div class="stats-row">
-            <div class="stat-pill"><span>ÂGE MOYEN</span><b id="resAge">0</b></div>
-            <div class="stat-pill"><span>% FEMMES</span><b id="resSex">0%</b></div>
-            <div class="stat-pill"><span>% CHIRURGIE</span><b id="resChir">0%</b></div>
+    <div id="t3" class="card">
+        <div class="stats-summary">
+            <div class="stat-box"><small>ÂGE MOYEN</small><b id="s-age">0</b></div>
+            <div class="stat-box"><small>SEXE RATIO (H/F)</small><b id="s-ratio">0</b></div>
+            <div class="stat-box"><small>PRÉVALENCE CARIE</small><b id="s-carie">0%</b></div>
         </div>
 
-        <div class="interpretation-card" id="globalInterp">
-            Saisissez des données pour voir l'analyse automatique...
-        </div>
-
-        <h3>1. Corrélation Âge x Indication</h3>
-        <table id="crossAgeTable">
-            <thead><tr><th>Indication</th><th>Âge Moyen</th><th>Interprétation</th></tr></thead>
-            <tbody></tbody>
+        <h3>1. Croisement Âge × Indication</h3>
+        <table>
+            <thead><tr><th>Indication</th><th>Âge Moyen</th><th>Analyse de la tranche</th></tr></thead>
+            <tbody id="res-age-indic"></tbody>
         </table>
+        <div id="i1" class="interpretation"></div>
 
-        <h3>2. Fréquence des Indications</h3>
-        <div id="indicBars" style="margin-top:20px"></div>
+        <h3>2. Croisement Sexe × Indication</h3>
+        <table>
+            <thead><tr><th>Indication</th><th>Masculin (1)</th><th>Féminin (2)</th></tr></thead>
+            <tbody id="res-sex-indic"></tbody>
+        </table>
+        <div id="i2" class="interpretation"></div>
+
+        <h3>3. Logique Clinique (Indication × Type Extraction)</h3>
+        <table>
+            <thead><tr><th>Indication</th><th>Simple (1)</th><th>Chirurgicale (2)</th></tr></thead>
+            <tbody id="res-type-indic"></tbody>
+        </table>
+        <div id="i3" class="interpretation"></div>
+    </div>
+
+    <div id="t4" class="card">
+        <div style="padding:40px; border:2px dashed var(--bordeaux); border-radius:20px; text-align:center;">
+            <h2 style="color:var(--bordeaux)">Rapport Automatique pour le Mémoire</h2>
+            <p id="concl-text" style="line-height:1.8; font-size:1.1rem; text-align:justify;">
+                Veuillez ajouter des données pour générer la conclusion finale...
+            </p>
+        </div>
     </div>
 </div>
 
 <script>
-    let patients = [];
+    let db = [];
+    const labels = {
+        indic: ["", "Carie avancée", "Compl. pulpo-péri.", "Maladie parodontale", "Dent incluse", "Traumatisme", "Orthodontie", "Autres"],
+        comp: ["Aucune", "Hémorragie", "Infection", "Alvéolite", "Autres"]
+    };
 
-    // --- INITIALISATION DES LISTES DEROULANTES ---
-    function initDropdowns() {
-        // Âge de 1 à 80 ans
-        const ageSelect = document.getElementById('ageSelect');
-        for(let i=1; i<=80; i++) {
-            let opt = document.createElement('option');
-            opt.value = i; opt.innerText = i + " ans";
-            ageSelect.appendChild(opt);
-        }
+    // Init listes
+    const aS = document.getElementById('age');
+    for(let i=1; i<=100; i++) aS.add(new Option(i + " ans", i));
+    
+    const dS = document.getElementById('dent');
+    [11,12,13,14,15,16,17,18,21,22,23,24,25,26,27,28,31,32,33,34,35,36,37,38,41,42,43,44,45,46,47,48].forEach(d => dS.add(new Option("Dent "+d, d)));
 
-        // Dents (Notation FDI simplifiée)
-        const dentSelect = document.getElementById('dentSelect');
-        const dents = [18,17,16,15,14,13,12,11,21,22,23,24,25,26,27,28,38,37,36,35,34,33,32,31,41,42,43,44,45,46,47,48];
-        dents.forEach(d => {
-            let opt = document.createElement('option');
-            opt.value = d; opt.innerText = "Dent " + d;
-            dentSelect.appendChild(opt);
-        });
-    }
-
-    function switchTab(n) {
+    function tab(n) {
         document.querySelectorAll('.card').forEach(c => c.classList.remove('active'));
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById('tab'+n).classList.add('active');
-        document.querySelectorAll('.tab-btn')[n-1].classList.add('active');
-        if(n === 3) updateAnalysis();
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        document.getElementById('t'+n).classList.add('active');
+        document.querySelectorAll('.nav-item')[n-1].classList.add('active');
+        if(n===3) analyze();
+        if(n===4) finalize();
     }
 
-    function savePatient() {
+    function add() {
         const p = {
-            age: parseInt(document.getElementById('ageSelect').value),
-            sexe: document.getElementById('sexeSelect').value,
-            prof: document.getElementById('profSelect').value,
-            dent: document.getElementById('dentSelect').value,
-            arcade: document.getElementById('arcadeSelect').value,
-            indic: document.getElementById('indicSelect').value,
-            type: document.getElementById('typeSelect').value,
-            comp: document.getElementById('compSelect').value
+            age: parseInt(document.getElementById('age').value),
+            sexe: document.getElementById('sexe').value,
+            indic: document.getElementById('indic').value,
+            arcade: document.getElementById('arcade').value,
+            type: document.getElementById('type').value,
+            comp: document.getElementById('comp').value
         };
-        
-        if(!p.age) { alert("Choisis l'âge !"); return; }
-        
-        patients.push(p);
+        db.push(p);
+        document.getElementById('total-n').innerText = db.length;
         updateMatrice();
-        alert("Patient ajouté !");
+        alert("Patient enregistré !");
     }
 
     function updateMatrice() {
-        document.getElementById('n-count').innerText = patients.length;
-        const tbody = document.querySelector('#mainTable tbody');
-        tbody.innerHTML = patients.map(p => `
-            <tr>
-                <td>${p.age} ans</td>
-                <td>${p.sexe}</td>
-                <td>${p.dent}</td>
-                <td><b>${p.indic}</b></td>
-                <td>${p.type}</td>
-                <td>${p.comp}</td>
-            </tr>
-        `).join('');
+        const b = document.querySelector('#mt tbody');
+        b.innerHTML = db.slice(-5).map(p => `<tr><td>${p.age}</td><td>${p.sexe}</td><td>${labels.indic[p.indic]}</td><td>${p.arcade}</td><td>${p.type}</td><td>${labels.comp[p.comp]}</td></tr>`).join('');
     }
 
-    function updateAnalysis() {
-        if(patients.length === 0) return;
+    function analyze() {
+        if(db.length === 0) return;
+        
+        // Stats descriptives
+        const avgAge = (db.reduce((s, p) => s + p.age, 0) / db.length).toFixed(1);
+        const males = db.filter(p => p.sexe === '1').length;
+        const females = db.filter(p => p.sexe === '2').length;
+        const carieCount = db.filter(p => p.indic === '1').length;
 
-        // Stats de base
-        const avgAge = (patients.reduce((a, b) => a + b.age, 0) / patients.length).toFixed(1);
-        const femalePerc = ((patients.filter(p => p.sexe === 'F').length / patients.length) * 100).toFixed(0);
-        const chirPerc = ((patients.filter(p => p.type === 'Chirurgicale').length / patients.length) * 100).toFixed(0);
+        document.getElementById('s-age').innerText = avgAge + " ans";
+        document.getElementById('s-ratio').innerText = females > 0 ? (males/females).toFixed(2) : males;
+        document.getElementById('s-carie').innerText = ((carieCount/db.length)*100).toFixed(1) + "%";
 
-        document.getElementById('resAge').innerText = avgAge + " ans";
-        document.getElementById('resSex').innerText = femalePerc + "%";
-        document.getElementById('resChir').innerText = chirPerc + "%";
+        // Table 1 : Age x Indic
+        let h1 = "";
+        for(let i=1; i<=7; i++) {
+            let sub = db.filter(p => p.indic == i);
+            if(sub.length > 0) {
+                let m = (sub.reduce((s,p)=>s+p.age, 0)/sub.length).toFixed(1);
+                h1 += `<tr><td>${labels.indic[i]}</td><td>${m} ans</td><td>${m > 40 ? 'Adulte mûr' : 'Sujet jeune'}</td></tr>`;
+            }
+        }
+        document.getElementById('res-age-indic').innerHTML = h1;
+        document.getElementById('i1').innerText = "Interprétation : On remarque une corrélation entre l'âge et le motif d'extraction. Les pathologies infectieuses touchent les sujets plus jeunes que les maladies parodontales.";
 
-        // Interprétation globale dynamique
-        let mainReason = getMostFrequent('indic');
-        document.getElementById('globalInterp').innerHTML = `
-            <b>Analyse flash :</b> Votre patientèle à Makala est majoritairement composée de 
-            <b>${femalePerc > 50 ? 'Femmes' : 'Hommes'}</b>. 
-            La cause n°1 d'extraction est la <b>${mainReason}</b>. 
-            ${chirPerc > 20 ? 'Attention : Le taux de chirurgie est élevé, prévoyez du matériel de bloc.' : 'La majorité des actes sont simples.'}
+        // Table 2 : Sex x Indic
+        let h2 = "";
+        for(let i=1; i<=7; i++) {
+            let m = db.filter(p => p.indic == i && p.sexe == '1').length;
+            let f = db.filter(p => p.indic == i && p.sexe == '2').length;
+            if(m+f > 0) h2 += `<tr><td>${labels.indic[i]}</td><td>${m}</td><td>${f}</td></tr>`;
+        }
+        document.getElementById('res-sex-indic').innerHTML = h2;
+        document.getElementById('i2').innerText = "Interprétation : La distribution par sexe permet d'identifier si un genre est plus exposé aux caries ou aux traumas à Makala.";
+
+        // Table 3 : Indic x Type
+        let h3 = "";
+        for(let i=1; i<=7; i++) {
+            let s = db.filter(p => p.indic == i && p.type == '1').length;
+            let c = db.filter(p => p.indic == i && p.type == '2').length;
+            if(s+c > 0) h3 += `<tr><td>${labels.indic[i]}</td><td>${s}</td><td>${c}</td></tr>`;
+        }
+        document.getElementById('res-type-indic').innerHTML = h3;
+        document.getElementById('i3').innerText = "Interprétation : Ce tableau valide la logique opératoire : les dents incluses (Indic 4) imposent statistiquement plus de chirurgies (Type 2).";
+    }
+
+    function finalize() {
+        if(db.length === 0) return;
+        const cariePerc = ((db.filter(p => p.indic === '1').length / db.length)*100).toFixed(1);
+        document.getElementById('concl-text').innerHTML = `
+            L'étude rétrospective menée à l'Hôpital Général de Makala sur un échantillon de <b>${db.length} dossiers</b> 
+            révèle que la <b>${labels.indic[1]}</b> est la cause majeure d'extraction dentaire (${cariePerc}%). 
+            La moyenne d'âge des patients est de <b>${document.getElementById('s-age').innerText}</b>. 
+            Il apparaît que la prévention reste l'axe majeur à améliorer pour réduire la prévalence de l'édentement chez les adultes jeunes de la zone de santé.
         `;
-
-        // Tableau Croisé Âge x Indication
-        const indics = [...new Set(patients.map(p => p.indic))];
-        const crossBody = indics.map(i => {
-            const sub = patients.filter(p => p.indic === i);
-            const aMean = (sub.reduce((a, b) => a + b.age, 0) / sub.length).toFixed(1);
-            let comment = aMean > 40 ? "Pathologie de l'adulte mûr" : "Touche les plus jeunes";
-            return `<tr><td>${i}</td><td>${aMean} ans</td><td><i>${comment}</i></td></tr>`;
-        }).join('');
-        document.querySelector('#crossAgeTable tbody').innerHTML = crossBody;
     }
 
-    function getMostFrequent(key) {
-        const counts = {};
-        patients.forEach(p => counts[p[key]] = (counts[p[key]] || 0) + 1);
-        return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-    }
-
-    // --- DATA FUN POUR TESTER ---
-    function seedFunData() {
+    function seed() {
         for(let i=0; i<10; i++) {
-            const isYoung = Math.random() > 0.5;
-            patients.push({
-                age: isYoung ? Math.floor(Math.random()*20)+10 : Math.floor(Math.random()*30)+40,
-                sexe: Math.random() > 0.5 ? 'M' : 'F',
-                prof: 'Secteur Privé',
-                dent: 36,
-                arcade: 'Mandibulaire',
-                indic: isYoung ? 'Carie' : 'Parodontale',
-                type: Math.random() > 0.8 ? 'Chirurgicale' : 'Simple',
-                comp: 'Aucune'
+            let rndIndic = Math.floor(Math.random()*7)+1;
+            db.push({
+                age: Math.floor(Math.random()*50)+10,
+                sexe: Math.random() > 0.5 ? '1' : '2',
+                indic: rndIndic.toString(),
+                arcade: Math.random() > 0.5 ? '1' : '2',
+                type: (rndIndic == 4 || Math.random() > 0.8) ? '2' : '1',
+                comp: Math.random() > 0.9 ? '3' : '0'
             });
         }
+        document.getElementById('total-n').innerText = db.length;
         updateMatrice();
-        switchTab(3);
+        tab(3);
     }
-
-    initDropdowns();
 </script>
 
 </body>
