@@ -1,571 +1,218 @@
-<!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestionnaire Étude Clinique - HGR Makala</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>Étude sur l'Équilibre Caféine-Sommeil-Productivité (Version Fun)</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --blue: #3498db;
-            --green: #27ae60;
-            --light: #ecf0f1;
-            --danger: #e74c3c;
-            --shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f7f6; margin: 0; color: #333; }
+        /* --- STYLE GLOBAL (Conservation exacte de ton design) --- */
+        body { font-family: 'Segoe UI', Arial, sans-serif; background-color: #f0f2f5; margin: 0; padding: 15px; }
+        .container { max-width: 1200px; margin: auto; background: white; border-radius: 12px; box-shadow: 0 4px 25px rgba(0,0,0,0.2); min-height: 900px;}
         
-        /* NAVIGATION */
-        .navbar { background: white; padding: 0 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: var(--shadow); position: sticky; top: 0; z-index: 100; }
-        .brand { font-weight: bold; font-size: 1.2rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
-        .nav-links { display: flex; gap: 5px; }
-        .nav-btn { background: none; border: none; padding: 20px 15px; cursor: pointer; font-weight: 600; color: #7f8c8d; border-bottom: 3px solid transparent; transition: 0.3s; }
-        .nav-btn:hover { background: #f8f9fa; color: var(--blue); }
-        .nav-btn.active { border-bottom: 3px solid var(--blue); color: var(--blue); }
+        .header-tabs { display: flex; background: #fff; border-bottom: 3px solid #6f4e37; padding: 12px; align-items: center; gap: 8px; position: sticky; top: 0; z-index: 100; }
+        .tab { padding: 10px 15px; font-weight: bold; font-size: 12px; text-decoration: none; border-radius: 4px; border: 1px solid #ddd; color: #555; background: #f8f9fa; cursor: pointer; transition: 0.2s; }
+        .tab.active { background: #6f4e37; color: white; border-color: #6f4e37; }
+        
+        .sim-badge { background: #4a90e2; color: white; padding: 5px 10px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 10px; }
+        .admin-only { display: none !important; }
+        .admin-visible { display: inline-block !important; }
+        
+        .btn-auth { margin-left: auto; background: #333; color: white; padding: 10px 15px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; }
+        .btn-excel { background: #2e7d32; color: white; padding: 10px 20px; border: none; border-radius: 4px; font-weight: bold; cursor: pointer; margin-left: 10px;}
 
-        /* CONTENT */
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .tab-content { display: none; animation: fadeIn 0.3s; }
-        .tab-content.active { display: block; }
+        .form-content { padding: 30px; display: none; }
+        .form-content.active { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
-        /* CARDS & FORMS */
-        .card { background: white; padding: 25px; border-radius: 8px; box-shadow: var(--shadow); margin-bottom: 20px; }
-        .card-header { border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px; font-weight: bold; color: var(--primary); text-transform: uppercase; font-size: 0.9rem; }
+        .section-title { background: #efebe9; color: #6f4e37; padding: 15px; font-weight: bold; border-left: 8px solid #6f4e37; margin: 30px 0 15px 0; text-transform: uppercase; font-size: 14px; }
+        .sub-title { font-weight: bold; color: #6f4e37; margin-top: 20px; border-bottom: 1px solid #eee; padding-bottom: 5px; }
         
-        .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 15px; }
+        .field { display: flex; flex-direction: column; }
+        label { font-size: 13px; font-weight: 700; margin-bottom: 6px; color: #222; }
+        select, input[type="text"], input[type="number"], textarea { padding: 10px; border: 1px solid #bbb; border-radius: 6px; font-size: 14px; background: #fff; width: 100%; box-sizing: border-box; }
 
-        .form-group { margin-bottom: 15px; }
-        label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; color: #555; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 0.9rem; box-sizing: border-box; }
-        input:focus, select:focus { border-color: var(--blue); outline: none; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; font-size: 12px; }
+        th { background: #f8f9fa; padding: 10px; border: 1px solid #ddd; text-align: center; }
+        td { border: 1px solid #eee; padding: 10px; text-align: center; }
 
-        /* BUTTONS */
-        .btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s; }
-        .btn-primary { background: var(--blue); color: white; }
-        .btn-primary:hover { background: #2980b9; }
-        .btn-success { background: var(--green); color: white; }
-        .btn-danger { background: var(--danger); color: white; }
+        .check-group { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 10px; background: #fdfdfd; padding: 15px; border: 1px solid #eee; border-radius: 8px; }
+        .check-item { display: flex; align-items: center; font-size: 13px; cursor: pointer; }
+        .check-item input { margin-right: 12px; }
 
-        /* TABLES */
-        table { width: 100%; border-collapse: collapse; font-size: 0.9rem; }
-        th, td { padding: 12px; border: 1px solid #eee; text-align: left; }
-        th { background: #f8f9fa; color: var(--primary); }
-        .cross-tab th { background: #eaf2f8; text-align: center; }
-        .cross-tab td { text-align: center; }
-        .highlight-cell { background-color: #e8f6f3; font-weight: bold; color: var(--green); }
-
-        /* DENTAL SELECTOR */
-        .teeth-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; margin: 10px 0; }
-        .tooth { width: 35px; height: 35px; border: 1px solid #ddd; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; cursor: pointer; border-radius: 4px; }
-        .tooth:hover { background: #f0f0f0; }
-        .tooth.selected { background: var(--blue); color: white; border-color: var(--blue); }
-
-        /* STATS BOXES */
-        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 20px; }
-        .stat-box { background: white; padding: 15px; border-radius: 8px; box-shadow: var(--shadow); border-left: 4px solid var(--blue); }
-        .stat-val { font-size: 1.5rem; font-weight: bold; color: var(--primary); }
-        .stat-lbl { font-size: 0.8rem; color: #7f8c8d; text-transform: uppercase; }
-
-        /* PRINT */
-        @media print {
-            .navbar, .btn, .no-print { display: none; }
-            .card { box-shadow: none; border: 1px solid #ddd; }
-        }
+        .btn-save { width: 100%; background: #6f4e37; color: white; padding: 20px; border: none; border-radius: 8px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 40px; text-transform: uppercase; }
+        
+        .stat-card { background: white; border: 1px solid #e0e0e0; border-radius: 8px; padding: 15px; margin-bottom: 15px; }
+        .bar-container { display: flex; align-items: center; margin-bottom: 12px; font-size: 12px; }
+        .bar-label { width: 220px; font-weight: 600; }
+        .bar-track { flex-grow: 1; background: #f0f0f0; height: 20px; border-radius: 10px; margin: 0 15px; overflow: hidden; }
+        .bar-fill { height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 10px; transition: width 1s; }
+        
+        #toast { visibility: hidden; min-width: 250px; background-color: #333; color: #fff; text-align: center; border-radius: 2px; padding: 16px; position: fixed; z-index: 1000; left: 50%; bottom: 30px; transform: translateX(-50%); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from {bottom: 0; opacity: 0;} to {bottom: 30px; opacity: 1;} }
+        @keyframes fadeout { from {bottom: 30px; opacity: 1;} to {bottom: 0; opacity: 0;} }
     </style>
 </head>
 <body>
 
-<nav class="navbar">
-    <div class="brand">
-        <span style="font-size: 1.5rem;">🦷</span> ÉTUDE HGR MAKALA
-    </div>
-    <div class="nav-links">
-        <button class="nav-btn active" onclick="switchTab('tab-collecte')">1. Collecte</button>
-        <button class="nav-btn" onclick="switchTab('tab-matrice')">2. Matrice</button>
-        <button class="nav-btn" onclick="switchTab('tab-analyse')">3. Analyse & Résultats</button>
-        <button class="nav-btn" onclick="switchTab('tab-concl')">4. Conclusion</button>
-    </div>
-</nav>
-
 <div class="container">
-
-    <div id="tab-collecte" class="tab-content active">
-        <div class="card">
-            <div class="card-header">Saisie Dossier Patient (Rétrospectif)</div>
-            <form id="dataForm">
-                <div class="grid-4">
-                    <div class="form-group">
-                        <label>N° Dossier</label>
-                        <input type="text" id="id_dossier" placeholder="Ex: 2023-001" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Date de l'acte</label>
-                        <input type="date" id="date_acte" required>
-                    </div>
-                </div>
-
-                <hr style="border:0; border-top:1px solid #eee; margin: 20px 0;">
-                
-                <div class="grid-4">
-                    <div class="form-group">
-                        <label>Âge (ans)</label>
-                        <input type="number" id="age" min="1" max="110" required>
-                    </div>
-                    <div class="form-group">
-                        <label>Sexe</label>
-                        <select id="sexe" required>
-                            <option value="M">Masculin</option>
-                            <option value="F">Féminin</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Profession</label>
-                        <select id="profession">
-                            <option value="Sans emploi">Sans emploi</option>
-                            <option value="Etudiant">Élève/Étudiant</option>
-                            <option value="Ouvrier">Ouvrier/Artisan</option>
-                            <option value="Fonctionnaire">Fonctionnaire</option>
-                            <option value="Commerce">Commerçant(e)</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Résidence</label>
-                        <select id="residence">
-                            <option value="Makala">C. Makala (Local)</option>
-                            <option value="Bumbu">C. Bumbu</option>
-                            <option value="Ngaba">C. Ngaba</option>
-                            <option value="Autre">Autre Commune</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="card-header" style="margin-top:20px;">Données Cliniques</div>
-                
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Motif de consultation</label>
-                        <input type="text" id="motif" placeholder="Douleur, Gonflement, Esthétique...">
-                    </div>
-                    <div class="form-group">
-                        <label>Arcade</label>
-                        <select id="arcade">
-                            <option value="Maxillaire">Maxillaire (Haut)</option>
-                            <option value="Mandibule">Mandibule (Bas)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label>Dent Concernée (Sélectionner)</label>
-                    <div class="teeth-container" id="teeth-grid">
-                        </div>
-                    <input type="hidden" id="dent_selected">
-                </div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Indication (Diagnostic)</label>
-                        <select id="indication" required>
-                            <option value="Carie">Carie dentaire (et complications)</option>
-                            <option value="Parodonte">Maladie Parodontale (Mobilité)</option>
-                            <option value="Trauma">Traumatisme</option>
-                            <option value="Ortho">Orthodontie</option>
-                            <option value="Incluse">Dent Incluse/Enclavée</option>
-                            <option value="Prothese">Raisons Prothétiques</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Radiographie pré-op ?</label>
-                        <select id="radio">
-                            <option value="Non">Non</option>
-                            <option value="Oui">Oui</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="grid-2">
-                    <div class="form-group">
-                        <label>Type d'Extraction</label>
-                        <select id="type_ext">
-                            <option value="Simple">Simple (Élévateur/Davier)</option>
-                            <option value="Chirurgicale">Chirurgicale (Alvéolectomie/Séparation)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Complications Post-op</label>
-                        <select id="complication">
-                            <option value="Aucune">Aucune</option>
-                            <option value="Hemorragie">Hémorragie</option>
-                            <option value="Alveolite">Alvéolite</option>
-                            <option value="Infection">Infection/Abcès</option>
-                            <option value="Autre">Autre</option>
-                        </select>
-                    </div>
-                </div>
-
-                <button type="button" class="btn btn-primary" style="width:100%; margin-top:20px;" onclick="addData()">💾 ENREGISTRER LE DOSSIER</button>
-            </form>
-        </div>
-    </div>
-
-    <div id="tab-matrice" class="tab-content">
-        <div class="card">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <div class="card-header" style="margin:0; border:none;">Matrice des Données (Base de données)</div>
-                <button class="btn btn-success" onclick="exportCSV()">📥 Exporter CSV (Excel)</button>
-            </div>
-            <div style="overflow-x:auto; margin-top:20px;">
-                <table id="dataTable">
-                    <thead>
-                        <tr>
-                            <th>ID</th><th>Age</th><th>Sexe</th><th>Prof.</th><th>Résidence</th><th>Indication</th><th>Dent</th><th>Type</th><th>Comp.</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
-            <button class="btn btn-danger" style="margin-top:20px;" onclick="clearData()">⚠️ Effacer toute la base</button>
-        </div>
-    </div>
-
-    <div id="tab-analyse" class="tab-content">
+    <div class="header-tabs">
+        <button class="tab active" onclick="switchTab(1)">1. DIAGNOSTIC DU MATIN</button>
+        <button class="tab admin-only" id="tab-2" onclick="switchTab(2)">2. RÉPERTOIRE DES ZOMBIES</button>
+        <button class="tab admin-only" id="tab-3" onclick="switchTab(3)">3. ANALYSE DE LA PRODUCTIVITÉ</button>
         
-        <div class="card">
-            <div class="card-header">1. Statistiques Descriptives Générales</div>
-            <div class="stat-grid">
-                <div class="stat-box">
-                    <div class="stat-val" id="stat-n">0</div>
-                    <div class="stat-lbl">Effectif Total (N)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-val" id="stat-age">0</div>
-                    <div class="stat-lbl">Âge Moyen ± ET</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-val" id="stat-sexratio">0</div>
-                    <div class="stat-lbl">Sexe Ratio (H/F)</div>
-                </div>
-                <div class="stat-box">
-                    <div class="stat-val" id="stat-comp-rate">0%</div>
-                    <div class="stat-lbl">Taux Complications</div>
-                </div>
-            </div>
-        </div>
+        <div class="sim-badge">ÉTUDE: HUMAINS FATIGUÉS (N=420)</div>
+        <button type="button" class="btn-auth" id="btn-auth" onclick="window.requestAdmin()">🔑 ACCÈS GURU</button>
+    </div>
 
-        <div class="grid-2">
-            <div class="card">
-                <div class="card-header">Prévalence des Indications</div>
-                <canvas id="chartIndications"></canvas>
-            </div>
-            <div class="card">
-                <div class="card-header">Répartition par Sexe</div>
-                <canvas id="chartSexe"></canvas>
-            </div>
-        </div>
-
-        <h3 style="color:var(--primary); margin-top:30px;">2. Étude Analytique (Tableaux Croisés)</h3>
+    <div id="content-1" class="form-content active">
+        <h2 style="color:#6f4e37; text-align:center;">🔬 Questionnaire de Survie en Milieu Urbain</h2>
         
-        <div class="card">
-            <div class="card-header">Tableau 1 : Association Âge (Groupé) vs Indication</div>
-            <p style="font-size:0.8rem; color:#666; margin-top:-10px; margin-bottom:15px;">Permet d'observer si certaines pathologies sont liées à des tranches d'âge spécifiques.</p>
-            <div id="crossTabAgeIndic"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Tableau 2 : Association Sexe vs Indication</div>
-            <div id="crossTabSexeIndic"></div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">Tableau 3 : Indication vs Type d'Extraction</div>
-            <p style="font-size:0.8rem; color:#666;">Vérification de la cohérence clinique (ex: Dents incluses = Chirurgie ?)</p>
-            <div id="crossTabIndicType"></div>
-        </div>
-
-    </div>
-
-    <div id="tab-concl" class="tab-content">
-        <div class="card">
-            <div class="card-header">Générateur de Rapport Automatique</div>
-            <div id="autoReport" style="line-height: 1.8; color: #2c3e50;">
-                <p><em>Veuillez entrer des données pour générer le rapport.</em></p>
+        <form id="funForm">
+            <div class="section-title">I. PROFIL DU SPÉCIMEN</div>
+            <div class="row">
+                <div class="field">
+                    <label>Pseudo / Identifiant</label>
+                    <input type="text" id="pseudo" placeholder="Ex: CaptainSommeil">
+                </div>
+                <div class="field">
+                    <label>Niveau de fatigue (0-10)</label>
+                    <input type="number" id="fatigue" min="0" max="10">
+                </div>
+                <div class="field">
+                    <label>Boisson de prédilection</label>
+                    <select id="boisson">
+                        <option>Espresso serré (L'artillerie lourde)</option>
+                        <option>Thé vert (Le philosophe)</option>
+                        <option>Soda (Le sucre avant tout)</option>
+                        <option>Eau (Le puriste)</option>
+                    </select>
+                </div>
             </div>
-        </div>
+
+            <div class="section-title">II. CONNAISSANCES EN "ADULTING"</div>
+            <div class="row">
+                <div class="field">
+                    <label>Combien de cafés avant de devenir irritable ?</label>
+                    <select id="q-cafe">
+                        <option>0 (Je suis né en colère)</option>
+                        <option>1 à 3 (Normal)</option>
+                        <option>Plus de 5 (Je vois le futur)</option>
+                    </select>
+                </div>
+                <div class="field">
+                    <label>D'après vous, qu'est-ce qu'une "bonne nuit" ?</label>
+                    <select id="q-sommeil">
+                        <option>Un mythe urbain</option>
+                        <option>4-6 heures (Mode survie)</option>
+                        <option>8 heures (Le paradis)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="sub-title">Signes de Procrastination (Cochez ce que vous faites)</div>
+            <div class="check-group">
+                <label class="check-item"><input type="checkbox" value="scroll"> Scroller TikTok pendant 2h</label>
+                <label class="check-item"><input type="checkbox" value="clean"> Nettoyer toute la maison pour ne pas bosser</label>
+                <label class="check-item"><input type="checkbox" value="reorg"> Réorganiser ses dossiers Windows</label>
+                <label class="check-item"><input type="checkbox" value="snack"> Chercher un snack alors qu'on n'a pas faim</label>
+            </div>
+
+            <div class="section-title">III. AUTO-ÉVALUATION (Échelle de Sagesse)</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th style="text-align:left">Assertion</th>
+                        <th>Pas d'accord</th>
+                        <th>Neutre</th>
+                        <th>Totalement !</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td style="text-align:left">Je peux arrêter le café quand je veux.</td>
+                        <td><input type="radio" name="att1" value="1"></td><td><input type="radio" name="att1" value="2"></td><td><input type="radio" name="att1" value="3"></td>
+                    </tr>
+                    <tr>
+                        <td style="text-align:left">Le mode "Ne pas déranger" est mon meilleur ami.</td>
+                        <td><input type="radio" name="att2" value="1"></td><td><input type="radio" name="att2" value="2"></td><td><input type="radio" name="att2" value="3"></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="button" class="btn-save" onclick="saveFun()">🚀 ENVOYER MON BILAN PSYCHOLOGIQUE</button>
+        </form>
     </div>
 
+    <div id="content-2" class="form-content">
+        <div class="section-title">LISTE DES SURVIVANTS</div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Pseudo</th><th>Boisson</th><th>Niveau Fatigue</th><th>Diagnostic</th>
+                </tr>
+            </thead>
+            <tbody id="fun-body">
+                <tr><td>DevStressé</td><td>Espresso</td><td>9/10</td><td>🔴 Au bord du burn-out</td></tr>
+                <tr><td>ZenMaster</td><td>Eau</td><td>2/10</td><td>🟢 Illuminé</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div id="content-3" class="form-content">
+        <div class="section-title">STATISTIQUES DE LA POPULATION</div>
+        <div class="stat-card">
+            <div class="sub-title">Sources de distraction principales</div>
+            <div id="graph-fun"></div>
+        </div>
+    </div>
 </div>
 
+<div id="toast">Donnée transmise à la NASA !</div>
+
 <script>
-    // --- VARIABLES GLOBALES ---
-    let db = JSON.parse(localStorage.getItem('makalaDB')) || [];
-    let charts = {};
+    let isAdmin = false;
 
-    // --- INITIALISATION ---
-    window.onload = function() {
-        renderTeeth();
-        updateAll();
-    };
-
-    function switchTab(id) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(id).classList.add('active');
-        event.currentTarget.classList.add('active');
-        
-        if(id === 'tab-analyse') renderCharts();
-        if(id === 'tab-concl') generateReport();
+    function switchTab(i) {
+        document.querySelectorAll('.form-content').forEach(c => c.classList.remove('active'));
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.getElementById('content-'+i).classList.add('active');
+        document.querySelectorAll('.tab')[i-1].classList.add('active');
     }
 
-    function renderTeeth() {
-        const container = document.getElementById('teeth-grid');
-        // FDI Notation
-        const teeth = [
-            18,17,16,15,14,13,12,11, 21,22,23,24,25,26,27,28,
-            48,47,46,45,44,43,42,41, 31,32,33,34,35,36,37,38
+    function requestAdmin() {
+        let code = prompt("Mot de passe secret (Indice: c'est 'café') :");
+        if(code === "café") {
+            isAdmin = true;
+            document.querySelectorAll('.admin-only').forEach(el => el.classList.add('admin-visible'));
+            document.getElementById('btn-auth').style.display = 'none';
+            renderStats();
+            alert("Accès autorisé. Bienvenue, Grand Sage.");
+        }
+    }
+
+    function saveFun() {
+        let pseudo = document.getElementById('pseudo').value || "Anonyme";
+        let toast = document.getElementById("toast");
+        toast.className = "show";
+        toast.innerText = "Bilan de " + pseudo + " enregistré !";
+        setTimeout(() => { toast.className = ""; }, 3000);
+    }
+
+    function renderStats() {
+        const data = [
+            {l: 'Réseaux Sociaux', p: 85, c: '#e91e63'},
+            {l: 'Vidéos de Chats', p: 65, c: '#ff9800'},
+            {l: 'Réunions inutiles', p: 95, c: '#f44336'},
+            {l: 'Travail réel', p: 15, c: '#4caf50'}
         ];
-        teeth.forEach(t => {
-            let div = document.createElement('div');
-            div.className = 'tooth';
-            div.innerText = t;
-            div.onclick = function() {
-                document.querySelectorAll('.tooth').forEach(el => el.classList.remove('selected'));
-                this.classList.add('selected');
-                document.getElementById('dent_selected').value = t;
-            }
-            container.appendChild(div);
-        });
-    }
-
-    // --- GESTION DES DONNÉES ---
-    function addData() {
-        const fields = ['id_dossier', 'date_acte', 'age', 'sexe', 'profession', 'residence', 'motif', 'arcade', 'dent_selected', 'indication', 'radio', 'type_ext', 'complication'];
-        let record = {};
-        
-        // Validation simple
-        if(!document.getElementById('id_dossier').value || !document.getElementById('age').value) {
-            alert("Veuillez remplir au moins l'ID et l'Âge.");
-            return;
-        }
-
-        fields.forEach(f => record[f] = document.getElementById(f).value);
-        record.age = parseInt(record.age);
-
-        db.push(record);
-        localStorage.setItem('makalaDB', JSON.stringify(db));
-        
-        alert("Dossier enregistré !");
-        document.getElementById('dataForm').reset();
-        document.querySelectorAll('.tooth').forEach(el => el.classList.remove('selected'));
-        updateAll();
-    }
-
-    function updateAll() {
-        renderTable();
-        calculateStats();
-    }
-
-    function renderTable() {
-        const tbody = document.querySelector('#dataTable tbody');
-        tbody.innerHTML = '';
-        db.forEach((row, index) => {
-            let tr = `<tr>
-                <td>${row.id_dossier}</td>
-                <td>${row.age}</td>
-                <td>${row.sexe}</td>
-                <td>${row.profession}</td>
-                <td>${row.residence}</td>
-                <td>${row.indication}</td>
-                <td>${row.dent_selected}</td>
-                <td>${row.type_ext}</td>
-                <td style="color:${row.complication !== 'Aucune' ? 'red' : 'green'}">${row.complication}</td>
-                <td><button class="btn btn-danger" style="padding:2px 8px; font-size:10px" onclick="deleteRow(${index})">X</button></td>
-            </tr>`;
-            tbody.innerHTML += tr;
-        });
-    }
-
-    function deleteRow(index) {
-        if(confirm('Supprimer cette ligne ?')) {
-            db.splice(index, 1);
-            localStorage.setItem('makalaDB', JSON.stringify(db));
-            updateAll();
-        }
-    }
-
-    function clearData() {
-        if(confirm('ATTENTION : Voulez-vous vraiment TOUT effacer ?')) {
-            db = [];
-            localStorage.setItem('makalaDB', JSON.stringify(db));
-            updateAll();
-            location.reload();
-        }
-    }
-
-    // --- ANALYSE STATISTIQUE (LE CŒUR DU MÉMOIRE) ---
-    function calculateStats() {
-        const n = db.length;
-        if(n === 0) return;
-
-        // 1. Descriptif
-        document.getElementById('stat-n').innerText = n;
-
-        // Age Moyen & Ecart Type (SD)
-        const ages = db.map(r => r.age);
-        const meanAge = ages.reduce((a,b) => a+b, 0) / n;
-        const variance = ages.reduce((a,b) => a + Math.pow(b - meanAge, 2), 0) / n;
-        const sdAge = Math.sqrt(variance);
-        document.getElementById('stat-age').innerText = `${meanAge.toFixed(1)} ± ${sdAge.toFixed(1)}`;
-
-        // Sexe Ratio
-        const males = db.filter(r => r.sexe === 'M').length;
-        const females = n - males;
-        document.getElementById('stat-sexratio').innerText = females > 0 ? (males/females).toFixed(2) : males;
-
-        // Taux complications
-        const comps = db.filter(r => r.complication !== 'Aucune').length;
-        document.getElementById('stat-comp-rate').innerText = ((comps/n)*100).toFixed(1) + '%';
-
-        // 2. Tableaux Croisés (Logique Pivot)
-        
-        // Groupes d'âge
-        const ageGroups = ['0-19', '20-39', '40-59', '60+'];
-        const indications = [...new Set(db.map(r => r.indication))];
-
-        // Helper pour catégoriser âge
-        const getAgeGroup = (age) => {
-            if(age < 20) return '0-19';
-            if(age < 40) return '20-39';
-            if(age < 60) return '40-59';
-            return '60+';
-        };
-
-        // Génération Crosstab 1: Age Group x Indication
-        generateCrossTab('crossTabAgeIndic', ageGroups, indications, (r) => getAgeGroup(r.age), (r) => r.indication);
-
-        // Génération Crosstab 2: Sexe x Indication
-        generateCrossTab('crossTabSexeIndic', ['M', 'F'], indications, (r) => r.sexe, (r) => r.indication);
-
-        // Génération Crosstab 3: Indication x Type Extraction
-        generateCrossTab('crossTabIndicType', indications, ['Simple', 'Chirurgicale'], (r) => r.indication, (r) => r.type_ext);
-    }
-
-    function generateCrossTab(containerId, rowLabels, colLabels, rowAccessor, colAccessor) {
-        let html = `<table class="cross-tab"><thead><tr><th>Variable</th>`;
-        colLabels.forEach(c => html += `<th>${c}</th>`);
-        html += `<th>Total</th></tr></thead><tbody>`;
-
-        rowLabels.forEach(rowLbl => {
-            html += `<tr><td><b>${rowLbl}</b></td>`;
-            let rowTotal = 0;
-            colLabels.forEach(colLbl => {
-                const count = db.filter(r => rowAccessor(r) === rowLbl && colAccessor(r) === colLbl).length;
-                rowTotal += count;
-                // Calcul % ligne pour analyse
-                const pct = rowTotal > 0 ? Math.round((count/rowTotal)*100) : 0; // Simplifié ici
-                // Cellule
-                html += `<td class="${count > 0 ? 'highlight-cell' : ''}">${count}</td>`;
-            });
-            html += `<td><strong>${rowTotal}</strong></td></tr>`;
-        });
-        html += `</tbody></table>`;
-        document.getElementById(containerId).innerHTML = html;
-    }
-
-    function renderCharts() {
-        if(db.length === 0) return;
-
-        const ctx1 = document.getElementById('chartIndications').getContext('2d');
-        const ctx2 = document.getElementById('chartSexe').getContext('2d');
-
-        // Data Prep Indication
-        const counts = {};
-        db.forEach(x => { counts[x.indication] = (counts[x.indication] || 0) + 1; });
-        
-        if(charts.c1) charts.c1.destroy();
-        charts.c1 = new Chart(ctx1, {
-            type: 'bar',
-            data: {
-                labels: Object.keys(counts),
-                datasets: [{
-                    label: "Nombre de cas",
-                    data: Object.values(counts),
-                    backgroundColor: '#3498db'
-                }]
-            }
-        });
-
-        // Data Prep Sexe
-        const m = db.filter(r => r.sexe === 'M').length;
-        const f = db.filter(r => r.sexe === 'F').length;
-
-        if(charts.c2) charts.c2.destroy();
-        charts.c2 = new Chart(ctx2, {
-            type: 'pie',
-            data: {
-                labels: ['Masculin', 'Féminin'],
-                datasets: [{
-                    data: [m, f],
-                    backgroundColor: ['#2980b9', '#e74c3c']
-                }]
-            }
-        });
-    }
-
-    // --- RAPPORT AUTOMATIQUE ---
-    function generateReport() {
-        if(db.length === 0) return;
-
-        // Analyse Indication Dominante
-        const counts = {};
-        db.forEach(x => { counts[x.indication] = (counts[x.indication] || 0) + 1; });
-        const topIndic = Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b);
-        
-        // Moyenne âge
-        const ages = db.map(r => r.age);
-        const meanAge = (ages.reduce((a,b) => a+b, 0) / db.length).toFixed(1);
-
-        let html = `
-            <h3>Synthèse des Résultats</h3>
-            <p>Au terme de cette étude rétrospective menée à l'Hôpital Général de Référence de Makala, portant sur un échantillon de <strong>${db.length} dossiers</strong> :</p>
-            <ul>
-                <li>La population d'étude présente une moyenne d'âge de <strong>${meanAge} ans</strong>.</li>
-                <li>L'indication principale d'extraction dentaire est <strong>"${topIndic}"</strong>, représentant ${counts[topIndic]} cas.</li>
-                <li>Le taux de complication post-opératoire s'élève à <strong>${document.getElementById('stat-comp-rate').innerText}</strong>.</li>
-            </ul>
-
-            <h3>Recommandations Cliniques</h3>
-            <ol>
-                <li>
-                    <strong>Prévention ciblée :</strong> Puisque "${topIndic}" est prédominant, les efforts de sensibilisation dans la zone de santé de Makala doivent se focaliser sur cette pathologie.
-                </li>
-                <li>
-                    <strong>Gestion des données :</strong> La systématisation de la saisie des dossiers (telle que simulée ici) est cruciale pour le suivi longitudinal des patients.
-                </li>
-            </ol>
-            <p style="font-size:0.8rem; color:grey; margin-top:20px;">*Note : Ce rapport est généré automatiquement basé sur les données saisies. Une validation statistique via un logiciel dédié (SPSS/R) est recommandée pour les tests de significativité (p-value) dans le mémoire final.*</p>
-        `;
-        document.getElementById('autoReport').innerHTML = html;
-    }
-
-    function exportCSV() {
-        let csv = "ID;Date;Age;Sexe;Profession;Residence;Motif;Arcade;Dent;Indication;Radio;Type;Complication\n";
-        db.forEach(r => {
-            csv += `${r.id_dossier};${r.date_acte};${r.age};${r.sexe};${r.profession};${r.residence};${r.motif};${r.arcade};${r.dent_selected};${r.indication};${r.radio};${r.type_ext};${r.complication}\n`;
-        });
-        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = "donnees_makala_complet.csv";
-        link.click();
+        document.getElementById('graph-fun').innerHTML = data.map(i => `
+            <div class="bar-container">
+                <div class="bar-label">${i.l}</div>
+                <div class="bar-track"><div class="bar-fill" style="width:${i.p}%; background:${i.c}">${i.p}%</div></div>
+            </div>
+        `).join('');
     }
 </script>
-
 </body>
 </html>
